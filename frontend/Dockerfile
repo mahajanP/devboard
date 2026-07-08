@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN npm install --legacy-peer-deps --verbose
 
 # Install Vite only if it's not already present
 RUN npm list vite > /dev/null 2>&1 || npm install --no-save vite@5.4.11
