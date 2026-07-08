@@ -1,35 +1,34 @@
-# Stage 1 — build the app
+# Stage 1 - Build the application
 FROM dhi.io/node:26-dev AS build
 
 WORKDIR /app
 
+# Copy dependency files first for better caching
 COPY package*.json ./
 
+# Install dependencies
 RUN npm install --legacy-peer-deps
 
-# Install vite explicitly if not already in package.json
+# Install Vite only if it's not already present
 RUN npm list vite > /dev/null 2>&1 || npm install --no-save vite@5.4.11
 
+# Copy application source
 COPY . .
 
+# Build the application
 RUN npm run build
 
-# Stage 2 — distroless runtime (minimal, secure)
+# Stage 2 - Runtime image
 FROM dhi.io/node:26
 
 WORKDIR /app
 
-# Copy built files from builder
+# Copy build artifacts and dependencies
 COPY --from=build /app/dist ./dist
-
-# Copy all node_modules from builder (includes vite)
 COPY --from=build /app/node_modules ./node_modules
-
-#COPY vite.preview.config.js ./vite.config.js
-COPY --from=build /app/vite.config.js ./vite.config.js
+COPY --from=build /app/package*.json ./
 
 EXPOSE 4173
 
-# Use exec form for proper signal handling
-ENTRYPOINT ["node", "--no-warnings"]
+# Start Vite preview server
 CMD ["./node_modules/.bin/vite", "preview", "--host", "0.0.0.0", "--port", "4173"]
