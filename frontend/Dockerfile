@@ -1,34 +1,18 @@
-# Stage 1 - Build the application
-FROM dhi.io/node:26-dev AS build
+# By Prakash Mahajan
+# step 1 bring the base image
+FROM node:24
 
+# step 2 create a folder where code can stay
 WORKDIR /app
 
-# Copy dependency files first for better caching
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install --legacy-peer-deps --verbose
-
-# Install Vite only if it's not already present
-RUN npm list vite > /dev/null 2>&1 || npm install --no-save vite@5.4.11
-
-# Copy application source
+# step 3 copy the code from host machine to the container
 COPY . .
 
-# Build the application
-RUN npm run build
+# step 4 install the required dependencies
+RUN npm install  --legacy-peer-deps
 
-# Stage 2 - Runtime image
-FROM dhi.io/node:26
+# step 5 expose the port number for documentation purposes
+EXPOSE 5173
 
-WORKDIR /app
-
-# Copy build artifacts and dependencies
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package*.json ./
-
-EXPOSE 4173
-
-# Start Vite preview server
-CMD ["./node_modules/.bin/vite", "preview", "--host", "0.0.0.0", "--port", "4173"]
+# step 6 run the application
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
