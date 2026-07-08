@@ -25,7 +25,8 @@ COPY --from=build /app/dist ./dist
 # Copy all node_modules from builder (includes vite)
 COPY --from=build /app/node_modules ./node_modules
 
-COPY vite.preview.config.js ./vite.config.js
+#COPY vite.preview.config.js ./vite.config.js
+COPY --from=build /app/vite.config.js ./vite.config.js
 
 EXPOSE 4173
 
