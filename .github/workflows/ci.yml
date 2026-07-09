@@ -1,5 +1,5 @@
 #ci.yml build-and-push
-#Goals: Build the image for devBoard frontend and push to docker hub
+#Goals: Build the image for devBoard frontend and push to docker hub after lint build docker file
 name: CI
 
 on:
